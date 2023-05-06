@@ -1,0 +1,10 @@
+apiVersion: 1
+providers:
+  - name: 'OpenTelemetry KibaZen'
+    orgId: 1
+    folder: 'KibaZen'
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /etc/grafana/provisioning/dashboards/general

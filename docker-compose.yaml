@@ -1,5 +1,16 @@
 version: "3.9"
 
+x-default-logging: &logging
+  driver: "json-file"
+  options:
+    max-size: "5m"
+    max-file: "2"
+
+networks:
+  default:
+    name: opentelemetry
+    driver: bridge
+
 services:
   prometheus:
     image: prom/prometheus
@@ -21,39 +32,56 @@ services:
           memory: 300M
     ports:
       - "9090"
+    logging: *logging
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    deploy:
+      resources:
+        limits:
+          memory: 100M
+    volumes:
+      - ./src/grafana/grafana.ini:/etc/grafana/grafana.ini
+      - ./src/grafana/provisioning/:/etc/grafana/provisioning/
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    logging: *logging
 
   jaeger:
     image: jaegertracing/all-in-one
     container_name: jaeger
     command:
-      - "--memory.max-traces"
-      - "10000"
-      - "--query.base-path"
-      - "/jaeger/ui"
-      - "--prometheus.server-url"
-      - "http://prometheus:9090"
+      - "--query.base-path=/jaeger/ui"
+      - "--prometheus.server-url=http://prometheus:9090"
     deploy:
       resources:
         limits:
           memory: 300M
     restart: unless-stopped
     ports:
-      - "4317"                          # OTLP gRPC default port
-      - "16686"                         # Jaeger UI
+      - "4317"          # OTLP gRPC default port
+      - "16686:16686"   # Jaeger UI
     environment:
       - COLLECTOR_OTLP_ENABLED=true
       - METRICS_STORAGE_TYPE=prometheus
+    depends_on:
+      - prometheus
+    logging: *logging
 
-  otelcollector:
+  otelcol:
     image: otel/opentelemetry-collector-contrib
-    container_name: otelcollector
+    container_name: otelcol
     command:
-      - "--config=/etc/otelcollector.yaml"
+      - "--config=/etc/otelcol.yaml"
     volumes:
-      - ./src/otelcollector/otelcollector.yaml:/etc/otelcollector.yaml
+      - ./src/otelcol/otelcol.yaml:/etc/otelcol.yaml
     ports:
-      - "4317"          # OTLP gRPC receiver
-      - "4318"          # OTLP http receiver
-      - "9464"          # Prometheus exporter
+      - "4317:4317"   # OTLP gRPC receiver
+      - "4318:4317"   # OTLP http receiver
+      - "9464"        # Prometheus exporter
     depends_on:
       - jaeger
+    logging: *logging
