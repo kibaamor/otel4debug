@@ -1,0 +1,76 @@
+# https://opentelemetry.io/docs/collector/configuration/
+
+
+# https://github.com/open-telemetry/opentelemetry-collector/tree/main/receiver
+receivers:
+
+  # https://github.com/open-telemetry/opentelemetry-collector/tree/main/receiver/otlpreceiver
+  otlp:
+    protocols:
+      http:
+      grpc:
+
+  # https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/prometheusreceiver
+  prometheus:
+    config:
+      scrape_configs:
+      - job_name: 'otelcollector'
+        scrape_interval: 10s
+        static_configs:
+        - targets: ['localhost:8888']
+
+# https://github.com/open-telemetry/opentelemetry-collector/tree/main/processor
+processors:
+  # https://github.com/open-telemetry/opentelemetry-collector/tree/main/processor/batchprocessor
+  batch:
+
+# https://github.com/open-telemetry/opentelemetry-collector/tree/main/exporter
+exporters:
+
+  # https://github.com/open-telemetry/opentelemetry-collector/tree/main/exporter/loggingexporter
+  logging:
+    verbosity: basic
+
+  # https://github.com/open-telemetry/opentelemetry-collector/tree/main/exporter/otlpexporter
+  otlp:
+    endpoint: "jaeger:4317"
+    tls:
+      insecure: true
+
+  # https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter/prometheusexporter
+  prometheus:
+    endpoint: "0.0.0.0:9464"
+    enable_open_metrics: true
+    resource_to_telemetry_conversion:
+      enabled: true
+
+# https://github.com/open-telemetry/opentelemetry-collector/tree/main/connector
+connectors:
+  # https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector
+  spanmetrics:
+
+# https://github.com/open-telemetry/opentelemetry-collector/tree/main/service
+service:
+
+  telemetry:
+    logs:
+      level: info
+      initial_fields:
+        service: otelcollector
+    metrics:
+      level: detailed
+      address: localhost:8888
+
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp, spanmetrics, logging]
+    metrics:
+      receivers: [otlp, spanmetrics]
+      processors: [batch]
+      exporters: [prometheus, logging]
+    logs:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [logging]

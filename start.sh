@@ -2,13 +2,13 @@
 
 rm -fr ./logs
 mkdir ./logs
-pushd logs
+cd logs
 for f in "traces" "metrics" "logs"
 do
     touch $f.json
     chmod a+w $f.json
 done
-popd
+cd ..
 
 docker compose down
 docker compose up
