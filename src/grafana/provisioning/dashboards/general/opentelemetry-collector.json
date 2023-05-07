@@ -1,7 +1,7 @@
 {
   "__inputs": [
     {
-      "name": "kibazen",
+      "name": "demo",
       "label": "Prometheus",
       "description": "",
       "type": "datasource",

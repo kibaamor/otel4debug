@@ -43,7 +43,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "kibazen-metrics"
+        "uid": "demo-metrics"
       },
       "fieldConfig": {
         "defaults": {
@@ -121,7 +121,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "expr": "rate(runtime_cpython_cpu_time{type=~\"system\"}[$__interval])*100",
@@ -132,7 +132,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "expr": "rate(runtime_cpython_cpu_time{type=~\"user\"}[$__interval])*100",
@@ -148,7 +148,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "kibazen-metrics"
+        "uid": "demo-metrics"
       },
       "fieldConfig": {
         "defaults": {
@@ -226,7 +226,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "expr": "rate(runtime_cpython_memory{type=~\"rss|vms\"}[$__interval])/1024/1024",
@@ -241,7 +241,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "kibazen-metrics"
+        "uid": "demo-metrics"
       },
       "fieldConfig": {
         "defaults": {
@@ -318,7 +318,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "expr": "rate(app_recommendations_counter{recommendation_type=\"catalog\"}[$__interval])",
@@ -333,7 +333,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "kibazen-metrics"
+        "uid": "demo-metrics"
       },
       "fieldConfig": {
         "defaults": {
@@ -410,7 +410,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "expr": "rate(calls_total{status_code=\"STATUS_CODE_ERROR\", service_name=\"${service}\"}[$__interval])",
@@ -425,7 +425,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "kibazen-metrics"
+        "uid": "demo-metrics"
       },
       "fieldConfig": {
         "defaults": {
@@ -503,7 +503,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "exemplar": true,
@@ -515,7 +515,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -528,7 +528,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -541,7 +541,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -558,7 +558,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "kibazen-metrics"
+        "uid": "demo-metrics"
       },
       "fieldConfig": {
         "defaults": {
@@ -636,7 +636,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "expr": "rate(duration_milliseconds_count{service_name=\"${service}\"}[$__rate_interval])",
@@ -663,7 +663,7 @@
         },
         "datasource": {
           "type": "prometheus",
-          "uid": "kibazen-metrics"
+          "uid": "demo-metrics"
         },
         "definition": "duration_milliseconds_bucket",
         "hide": 0,
@@ -689,7 +689,7 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "KibaZen Dashboard",
+  "title": "Demo Dashboard",
   "uid": "W2gX2zHVk",
   "version": 1,
   "weekStart": ""

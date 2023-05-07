@@ -21,7 +21,7 @@
       }
     ]
   },
-  "description": "Otel Collector Dashboard",
+  "description": "otelcol metrics dashboard",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
@@ -45,7 +45,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "kibazen-metrics"
+        "uid": "demo-metrics"
       },
       "description": "Otel Collector Instance",
       "fieldConfig": {
@@ -96,7 +96,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "expr": "count(count(otelcol_process_cpu_seconds{service_instance_id=~\".*\"}) by (service_instance_id))",
@@ -111,7 +111,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "kibazen-metrics"
+        "uid": "demo-metrics"
       },
       "description": "otelcol_process_cpu_seconds",
       "fieldConfig": {
@@ -161,7 +161,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "expr": "avg(rate(otelcol_process_cpu_seconds{}[$__rate_interval])*100) by (instance)",
@@ -176,7 +176,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "kibazen-metrics"
+        "uid": "demo-metrics"
       },
       "description": "Memory Rss\navg(otelcol_process_memory_rss{}) by (instance)",
       "fieldConfig": {
@@ -226,7 +226,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "expr": "avg(otelcol_process_memory_rss{}) by (instance)",
@@ -241,7 +241,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "kibazen-metrics"
+        "uid": "demo-metrics"
       },
       "description": "",
       "gridPos": {
@@ -279,7 +279,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "kibazen-metrics"
+        "uid": "demo-metrics"
       },
       "description": "(avg(sum by(job) (rate(otelcol_exporter_sent_spans{}[$__range]))) / avg(sum by(job) (rate(otelcol_receiver_accepted_spans{}[$__range])))) ",
       "fieldConfig": {
@@ -346,7 +346,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -361,7 +361,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "expr": "avg(sum by(job) (rate(otelcol_receiver_accepted_spans{}[$__range])))",
@@ -374,7 +374,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "expr": "(avg(sum by(job) (rate(otelcol_exporter_sent_spans{}[$__range]))) / avg(sum by(job) (rate(otelcol_receiver_accepted_spans{}[$__range])))) ",
@@ -391,7 +391,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "kibazen-metrics"
+        "uid": "demo-metrics"
       },
       "gridPos": {
         "h": 11,
@@ -409,7 +409,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -423,7 +423,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -442,7 +442,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "kibazen-metrics"
+        "uid": "demo-metrics"
       },
       "description": "Spans Accepted by Receiver and Transport",
       "fieldConfig": {
@@ -491,7 +491,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "expr": "sum(rate(otelcol_receiver_accepted_spans{}[$__rate_interval])) by (receiver,transport)",
@@ -506,7 +506,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "kibazen-metrics"
+        "uid": "demo-metrics"
       },
       "description": "Total Spans Accepted ",
       "fieldConfig": {
@@ -551,7 +551,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "expr": "sum(rate(otelcol_receiver_accepted_spans{}[$__rate_interval])) ",
@@ -566,7 +566,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "kibazen-metrics"
+        "uid": "demo-metrics"
       },
       "description": "Total Batch Processed",
       "fieldConfig": {
@@ -619,7 +619,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "expr": "sum(rate(otelcol_processor_batch_batch_send_size_sum{}[$__rate_interval]))  by (processor)",
@@ -634,7 +634,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "kibazen-metrics"
+        "uid": "demo-metrics"
       },
       "fieldConfig": {
         "defaults": {
@@ -678,7 +678,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -696,7 +696,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "kibazen-metrics"
+        "uid": "demo-metrics"
       },
       "description": "Sent by Exporter",
       "fieldConfig": {
@@ -744,7 +744,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -762,7 +762,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "kibazen-metrics"
+        "uid": "demo-metrics"
       },
       "fieldConfig": {
         "defaults": {
@@ -810,7 +810,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "expr": "sum(rate(otelcol_receiver_refused_spans{}[$__rate_interval])) by (receiver,transport)",
@@ -825,7 +825,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "kibazen-metrics"
+        "uid": "demo-metrics"
       },
       "description": "Total Spans Accepted ",
       "fieldConfig": {
@@ -870,7 +870,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "expr": "sum(rate(otelcol_receiver_refused_spans{}[$__rate_interval])) ",
@@ -885,7 +885,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "kibazen-metrics"
+        "uid": "demo-metrics"
       },
       "description": "otelcol_exporter_send_failed_spans",
       "fieldConfig": {
@@ -930,7 +930,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -948,7 +948,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "kibazen-metrics"
+        "uid": "demo-metrics"
       },
       "description": "Sent by Exporter\notelcol_exporter_send_failed_spans",
       "fieldConfig": {
@@ -996,7 +996,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -1027,7 +1027,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "kibazen-metrics"
+        "uid": "demo-metrics"
       },
       "description": "avg(sum by(job) (rate(otelcol_exporter_sent_metric_points{}[$__range]))) versus avg(sum by(job) (rate(otelcol_receiver_accepted_metric_points{}[$__range])))",
       "fieldConfig": {
@@ -1094,7 +1094,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -1109,7 +1109,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "expr": "avg(sum by(job) (rate(otelcol_receiver_accepted_metric_points{}[$__range])))",
@@ -1122,7 +1122,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "expr": "( avg(sum by(job) (rate(otelcol_exporter_sent_metric_points{}[$__range]))) /avg(sum by(job) (rate(otelcol_receiver_accepted_metric_points{}[$__range]))))",
@@ -1174,7 +1174,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "kibazen-metrics"
+        "uid": "demo-metrics"
       },
       "description": "Metrics Signalling Pipelines",
       "gridPos": {
@@ -1193,7 +1193,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -1207,7 +1207,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -1226,7 +1226,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "kibazen-metrics"
+        "uid": "demo-metrics"
       },
       "description": "otelcol_receiver_accepted_metric_points",
       "fieldConfig": {
@@ -1275,7 +1275,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "expr": "sum(rate(otelcol_receiver_accepted_metric_points{}[$__rate_interval])) by (receiver,transport)",
@@ -1290,7 +1290,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "kibazen-metrics"
+        "uid": "demo-metrics"
       },
       "description": "otelcol_receiver_accepted_metric_points\nTotal Accepted ",
       "fieldConfig": {
@@ -1335,7 +1335,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "expr": "sum(rate(otelcol_receiver_accepted_metric_points{}[$__rate_interval])) ",
@@ -1350,7 +1350,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "kibazen-metrics"
+        "uid": "demo-metrics"
       },
       "fieldConfig": {
         "defaults": {
@@ -1402,7 +1402,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "expr": "sum(rate(otelcol_processor_batch_batch_send_size_sum{}[$__rate_interval]))  by (processor)",
@@ -1417,7 +1417,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "kibazen-metrics"
+        "uid": "demo-metrics"
       },
       "description": "Total Export ",
       "fieldConfig": {
@@ -1462,7 +1462,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -1480,7 +1480,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "kibazen-metrics"
+        "uid": "demo-metrics"
       },
       "description": "Sent by Exporter",
       "fieldConfig": {
@@ -1528,7 +1528,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -1546,7 +1546,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "kibazen-metrics"
+        "uid": "demo-metrics"
       },
       "fieldConfig": {
         "defaults": {
@@ -1594,7 +1594,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "expr": "sum(rate(otelcol_receiver_refused_metric_points{}[$__rate_interval])) by (receiver,transport)",
@@ -1609,7 +1609,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "kibazen-metrics"
+        "uid": "demo-metrics"
       },
       "description": "Total Refused \nsum(rate(otelcol_receiver_refused_metric_points{}[$__rate_interval])) ",
       "fieldConfig": {
@@ -1654,7 +1654,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "expr": "sum(rate(otelcol_receiver_refused_metric_points{}[$__rate_interval])) ",
@@ -1669,7 +1669,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "kibazen-metrics"
+        "uid": "demo-metrics"
       },
       "description": "Total Failed Export ",
       "fieldConfig": {
@@ -1714,7 +1714,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -1732,7 +1732,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "kibazen-metrics"
+        "uid": "demo-metrics"
       },
       "description": "Sent by Exporter\notelcol_exporter_send_failed_spans",
       "fieldConfig": {
@@ -1780,7 +1780,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -1811,7 +1811,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "kibazen-metrics"
+        "uid": "demo-metrics"
       },
       "description": "otelcol prometheus exporter 9464 export rate versus prometheus scrape metrics",
       "fieldConfig": {
@@ -1878,7 +1878,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -1892,7 +1892,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "expr": "(sum(rate(otelcol_exporter_sent_metric_points{exporter=\"prometheus\"}[$__rate_interval])) )",
@@ -1941,7 +1941,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "kibazen-metrics"
+        "uid": "demo-metrics"
       },
       "description": "sum_over_time(scrape_samples_scraped[$__range])/ count_over_time(scrape_samples_scraped[$__range])",
       "fieldConfig": {
@@ -1992,7 +1992,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -2010,7 +2010,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "kibazen-metrics"
+        "uid": "demo-metrics"
       },
       "description": "scrape_samples_scraped{job!=\"\"}\nTotal Samples Scraped",
       "fieldConfig": {
@@ -2059,7 +2059,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -2094,7 +2094,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "kibazen-metrics"
+        "uid": "demo-metrics"
       },
       "gridPos": {
         "h": 9,
@@ -2108,7 +2108,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -2123,7 +2123,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "kibazen-metrics"
+            "uid": "demo-metrics"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -2153,7 +2153,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "kibazen-metrics"
+        "uid": "demo-metrics"
       },
       "description": "Sent by Exporter",
       "gridPos": {
@@ -2191,7 +2191,7 @@
         },
         "datasource": {
           "type": "prometheus",
-          "uid": "kibazen-metrics"
+          "uid": "demo-metrics"
         },
         "definition": "query_result(sum(otelcol_process_uptime{}) by (service_version))\n",
         "hide": 2,

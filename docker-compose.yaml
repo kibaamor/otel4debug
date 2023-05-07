@@ -75,12 +75,13 @@ services:
     image: otel/opentelemetry-collector-contrib
     container_name: otelcol
     command:
-      - "--config=/etc/otelcol.yaml"
+      - "--config=/etc/otelcollector.yaml"
     volumes:
-      - ./src/otelcol/otelcol.yaml:/etc/otelcol.yaml
+      - ./src/otelcollector/otelcollector.yaml:/etc/otelcollector.yaml
     ports:
       - "4317:4317"   # OTLP gRPC receiver
       - "4318:4317"   # OTLP http receiver
+      - "8888"        # Metrics for opentelemetry collector
       - "9464"        # Prometheus exporter
     depends_on:
       - jaeger
