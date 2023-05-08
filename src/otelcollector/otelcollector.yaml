@@ -35,6 +35,21 @@ exporters:
     resource_to_telemetry_conversion:
       enabled: true
 
+# https://github.com/open-telemetry/opentelemetry-collector/tree/main/extension
+extensions:
+
+  # https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/extension/healthcheckextension
+  health_check:
+    endpoint: "0.0.0.0:13133"
+
+  # https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/extension/pprofextension
+  pprof:
+    endpoint: 0.0.0.0:1777
+
+  # https://github.com/open-telemetry/opentelemetry-collector/blob/main/extension/zpagesextension/README.md
+  zpages:
+    endpoint: 0.0.0.0:55679
+
 # https://github.com/open-telemetry/opentelemetry-collector/tree/main/connector
 connectors:
   # https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector
@@ -42,6 +57,8 @@ connectors:
 
 # https://github.com/open-telemetry/opentelemetry-collector/tree/main/service
 service:
+
+  extensions: [health_check, pprof, zpages]
 
   telemetry:
     logs:

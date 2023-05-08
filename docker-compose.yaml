@@ -83,6 +83,9 @@ services:
       - "4318:4318"   # OTLP http receiver
       - "8888"        # Metrics for opentelemetry collector
       - "9464"        # Prometheus exporter
+      - "13133:13133" # health
+      - "1777:1777"   # pprof
+      - "55679:55679" # zpages (http://localhost:55679/debug)
     depends_on:
       - jaeger
     logging: *logging
