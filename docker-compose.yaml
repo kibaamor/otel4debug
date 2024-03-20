@@ -5,75 +5,69 @@ x-default-logging: &logging
   options:
     max-size: "5m"
     max-file: "2"
+    tag: "{{.Name}}|{{.ImageName}}|{{.ID}}"
 
 networks:
   default:
-    name: opentelemetry
+    name: opentelemetry-cluster
     driver: bridge
 
 services:
-  prometheus:
-    image: prom/prometheus
-    container_name: prometheus
-    command:
-      - --web.console.templates=/etc/prometheus/consoles
-      - --web.console.libraries=/etc/prometheus/console_libraries
-      - --storage.tsdb.retention.time=1h
-      - --config.file=/etc/prometheus/prometheus.yaml
-      - --storage.tsdb.path=/prometheus
-      - --web.enable-lifecycle
-      - --web.route-prefix=/
-      - --enable-feature=exemplar-storage
-    volumes:
-      - ./src/prometheus/prometheus.yaml:/etc/prometheus/prometheus.yaml
-    deploy:
-      resources:
-        limits:
-          memory: 300M
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.12.2
+    container_name: elasticsearch
+    restart: on-failure
     ports:
-      - "9090"
-    logging: *logging
-
-  grafana:
-    image: grafana/grafana:9.4.7
-    container_name: grafana
-    deploy:
-      resources:
-        limits:
-          memory: 100M
-    volumes:
-      - ./src/grafana/grafana.ini:/etc/grafana/grafana.ini
-      - ./src/grafana/provisioning/:/etc/grafana/provisioning/
-    ports:
-      - "3000:3000"
-    depends_on:
-      - prometheus
-    logging: *logging
-
-  jaeger:
-    image: jaegertracing/all-in-one
-    container_name: jaeger
-    command:
-      - "--query.base-path=/jaeger/ui"
-      - "--prometheus.server-url=http://prometheus:9090"
-    deploy:
-      resources:
-        limits:
-          memory: 300M
-    restart: unless-stopped
-    ports:
-      - "4317"          # OTLP gRPC default port
-      - "16686:16686"   # Jaeger UI
+      - "9200"
+      - "9300"
+    # https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-discovery-settings.html
     environment:
-      - COLLECTOR_OTLP_ENABLED=true
-      - METRICS_STORAGE_TYPE=prometheus
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    logging: *logging
+
+  jaegercollector:
+    image: jaegertracing/jaeger-collector:1.55
+    container_name: jaegercollector
+    restart: on-failure
+    # https://www.jaegertracing.io/docs/1.55/deployment/#collector
+    ports:
+      - "4317"
+      - "4318"
+    # https://www.jaegertracing.io/docs/1.55/cli/
+    environment:
+      - SPAN_STORAGE_TYPE=elasticsearch
+      - ES_SERVER_URLS=http://elasticsearch:9200
+    command:
+      - "--log-level=warn"
     depends_on:
-      - prometheus
+      - elasticsearch
+    logging: *logging
+
+  prometheus:
+    image: prom/prometheus:v2.51.0
+    container_name: prometheus
+    restart: on-failure
+    command:
+      - "--web.console.templates=/etc/prometheus/consoles"
+      - "--web.console.libraries=/etc/prometheus/console_libraries"
+      - "--storage.tsdb.retention.time=1h"
+      - "--config.file=/etc/prometheus/prometheus-config.yaml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.enable-lifecycle"
+      - "--web.route-prefix=/"
+      - "--enable-feature=exemplar-storage"
+      - "--enable-feature=otlp-write-receiver"
+    volumes:
+      - ./src/prometheus/prometheus-config.yaml:/etc/prometheus/prometheus-config.yaml
+    ports:
+      - "9090:9090"
     logging: *logging
 
   otelcol:
-    image: otel/opentelemetry-collector-contrib
+    image: otel/opentelemetry-collector-contrib:0.96.0
     container_name: otelcol
+    restart: on-failure
     command:
       - "--config=/etc/otelcollector.yaml"
     volumes:
@@ -81,11 +75,40 @@ services:
     ports:
       - "4317:4317"   # OTLP gRPC receiver
       - "4318:4318"   # OTLP http receiver
-      - "8888"        # Metrics for opentelemetry collector
-      - "9464"        # Prometheus exporter
-      - "13133:13133" # health
-      - "1777:1777"   # pprof
-      - "55679:55679" # zpages (http://localhost:55679/debug)
+      - "55679:55679" # zpages (http://localhost:55679/debug/servicez, http://localhost:55679/debug/tracez)
     depends_on:
-      - jaeger
+      - jaegercollector
+      - prometheus
+    logging: *logging
+
+  jaegerquery:
+    image: jaegertracing/jaeger-query:1.55
+    container_name: jaegerquery
+    restart: on-failure
+    command:
+      - "--log-level=warn"
+    # https://www.jaegertracing.io/docs/1.55/deployment/#query-service--ui
+    ports:
+      - "16686:16686"
+    # https://www.jaegertracing.io/docs/1.55/cli/
+    environment:
+      - SPAN_STORAGE_TYPE=elasticsearch
+      - ES_SERVER_URLS=http://elasticsearch:9200
+    depends_on:
+      - otelcol
+    logging: *logging
+
+  grafana:
+    image: grafana/grafana:10.0.12
+    container_name: grafana
+    restart: on-failure
+    volumes:
+      - ./src/grafana/grafana.ini:/etc/grafana/grafana.ini
+      - ./src/grafana/provisioning/:/etc/grafana/provisioning/
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SERVER_ROOT_URL=http://${DOMAIN_NAME}:3000
+    depends_on:
+      - otelcol
     logging: *logging

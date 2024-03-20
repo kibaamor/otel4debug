@@ -1,5 +1,5 @@
+# https://github.com/open-telemetry/opentelemetry-demo/blob/main/src/otelcollector/otelcol-config.yml
 # https://opentelemetry.io/docs/collector/configuration/
-
 
 # https://github.com/open-telemetry/opentelemetry-collector/tree/main/receiver
 receivers:
@@ -24,67 +24,40 @@ processors:
 # https://github.com/open-telemetry/opentelemetry-collector/tree/main/exporter
 exporters:
 
-  # https://github.com/open-telemetry/opentelemetry-collector/tree/main/exporter/loggingexporter
-  logging:
-    verbosity: basic
-
-  # https://github.com/open-telemetry/opentelemetry-collector/tree/main/exporter/otlpexporter
-  otlp:
-    endpoint: "jaeger:4317"
+  otlp/jaegercollector:
+    endpoint: "jaegercollector:4317"
     tls:
       insecure: true
 
-  # https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter/prometheusexporter
-  prometheus:
-    endpoint: "0.0.0.0:9464"
-    enable_open_metrics: true
-    resource_to_telemetry_conversion:
-      enabled: true
-
-# https://github.com/open-telemetry/opentelemetry-collector/tree/main/extension
-extensions:
-
-  # https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/extension/healthcheckextension
-  health_check:
-    endpoint: "0.0.0.0:13133"
-
-  # https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/extension/pprofextension
-  pprof:
-    endpoint: 0.0.0.0:1777
-
-  # https://github.com/open-telemetry/opentelemetry-collector/blob/main/extension/zpagesextension/README.md
-  zpages:
-    endpoint: 0.0.0.0:55679
+  # https://github.com/open-telemetry/opentelemetry-collector/tree/main/exporter/otlphttpexporter
+  otlphttp/prometheus:
+    endpoint: "http://prometheus:9090/api/v1/otlp"
+    tls:
+      insecure: true
 
 # https://github.com/open-telemetry/opentelemetry-collector/tree/main/connector
 connectors:
   # https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector
   spanmetrics:
 
+# https://github.com/open-telemetry/opentelemetry-collector/tree/main/extension
+extensions:
+
+  # https://github.com/open-telemetry/opentelemetry-collector/blob/main/extension/zpagesextension/README.md
+  zpages:
+    endpoint: 0.0.0.0:55679
+
 # https://github.com/open-telemetry/opentelemetry-collector/tree/main/service
 service:
 
-  extensions: [health_check, pprof, zpages]
-
-  telemetry:
-    logs:
-      level: info
-      initial_fields:
-        service: otelcollector
-    metrics:
-      level: detailed
-      address: 0.0.0.0:8888
+  extensions: [zpages]
 
   pipelines:
     traces:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp, spanmetrics, logging]
+      exporters: [otlp/jaegercollector, spanmetrics]
     metrics:
       receivers: [otlp, spanmetrics]
       processors: [batch]
-      exporters: [prometheus, logging]
-    logs:
-      receivers: [otlp]
-      processors: [batch]
-      exporters: [logging]
+      exporters: [otlphttp/prometheus]
