@@ -4,6 +4,6 @@ datasources:
   - name: Jaeger
     uid: otel-traces
     type: jaeger
-    url: http://jaegerquery:16686/jaeger/ui
+    url: http://jaegerquery:16686
     editable: true
     isDefault: false

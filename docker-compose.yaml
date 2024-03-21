@@ -9,13 +9,12 @@ x-default-logging: &logging
 
 networks:
   default:
-    name: opentelemetry-cluster
+    name: otel4debug
     driver: bridge
 
 services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.12.2
-    container_name: elasticsearch
     restart: on-failure
     ports:
       - "9200"
@@ -28,7 +27,6 @@ services:
 
   jaegercollector:
     image: jaegertracing/jaeger-collector:1.55
-    container_name: jaegercollector
     restart: on-failure
     # https://www.jaegertracing.io/docs/1.55/deployment/#collector
     ports:
@@ -46,7 +44,6 @@ services:
 
   prometheus:
     image: prom/prometheus:v2.51.0
-    container_name: prometheus
     restart: on-failure
     command:
       - "--web.console.templates=/etc/prometheus/consoles"
@@ -58,15 +55,15 @@ services:
       - "--web.route-prefix=/"
       - "--enable-feature=exemplar-storage"
       - "--enable-feature=otlp-write-receiver"
+      - "--web.enable-remote-write-receiver"
     volumes:
-      - ./src/prometheus/prometheus-config.yaml:/etc/prometheus/prometheus-config.yaml
+      - ./src/prometheus:/etc/prometheus
     ports:
-      - "9090"
+      - "9090:9090"
     logging: *logging
 
   otelcol:
     image: otel/opentelemetry-collector-contrib:0.96.0
-    container_name: otelcol
     restart: on-failure
     command:
       - "--config=/etc/otelcollector.yaml"
@@ -83,7 +80,6 @@ services:
 
   jaegerquery:
     image: jaegertracing/jaeger-query:1.55
-    container_name: jaegerquery
     restart: on-failure
     command:
       - "--log-level=warn"
@@ -100,7 +96,6 @@ services:
 
   grafana:
     image: grafana/grafana:10.0.12
-    container_name: grafana
     restart: on-failure
     volumes:
       - ./src/grafana/grafana.ini:/etc/grafana/grafana.ini

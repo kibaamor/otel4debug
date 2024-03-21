@@ -1,0 +1,10 @@
+apiVersion: 1
+providers:
+  - name: 'Application'
+    orgId: 1
+    folder: 'application'
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /etc/grafana/provisioning/dashboards/application

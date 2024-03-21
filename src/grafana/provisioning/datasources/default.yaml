@@ -7,3 +7,11 @@ datasources:
     url: http://prometheus:9090
     editable: true
     isDefault: true
+    jsonData:
+      exemplarTraceIdDestinations:
+        - datasourceUid: otel-traces
+          name: trace_id
+
+        - url: http://jaegerquery:16686/trace/$${__value.raw}
+          name: trace_id
+          urlDisplayLabel: View in Jaeger UI

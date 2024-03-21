@@ -1,8 +1,20 @@
 # https://github.com/open-telemetry/opentelemetry-demo/blob/main/src/otelcollector/otelcol-config.yml
 # https://opentelemetry.io/docs/collector/configuration/
 
+# https://grafana.com/grafana/dashboards/15983-opentelemetry-collector/
+# https://github.com/monitoringartist/opentelemetry-collector-monitoring
+
 # https://github.com/open-telemetry/opentelemetry-collector/tree/main/receiver
 receivers:
+
+  # https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/prometheusreceiver
+  prometheus:
+    config:
+      scrape_configs:
+      - job_name: otel-collector-metrics
+        scrape_interval: 10s
+        static_configs:
+          - targets: ["127.0.0.1:8888"]
 
   # https://github.com/open-telemetry/opentelemetry-collector/tree/main/receiver/otlpreceiver
   otlp:
@@ -23,6 +35,13 @@ processors:
 
 # https://github.com/open-telemetry/opentelemetry-collector/tree/main/exporter
 exporters:
+
+  # https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter/prometheusremotewriteexporter
+  prometheusremotewrite/prometheus:
+    # prometheus server must have '--enable-feature=remote-write-receiver' or '--web.enable-remote-write-receiver'
+    endpoint: "http://prometheus:9090/api/v1/write"
+    tls:
+      insecure: true
 
   otlp/jaegercollector:
     endpoint: "jaegercollector:4317"
@@ -52,12 +71,17 @@ service:
 
   extensions: [zpages]
 
+  telemetry:
+    metrics:
+      address: 127.0.0.1:8888
+      level: detailed
+
   pipelines:
     traces:
       receivers: [otlp]
       processors: [batch]
       exporters: [otlp/jaegercollector, spanmetrics]
     metrics:
-      receivers: [otlp, spanmetrics]
+      receivers: [prometheus, otlp, spanmetrics]
       processors: [batch]
-      exporters: [otlphttp/prometheus]
+      exporters: [prometheusremotewrite/prometheus, otlphttp/prometheus]
