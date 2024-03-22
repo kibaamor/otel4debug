@@ -1,4 +1,4 @@
 # https://github.com/open-telemetry/opentelemetry-demo/blob/main/src/prometheus/prometheus-config.yaml
 
 rule_files:
-  - 'prometheus-rules.yaml'
+  - "prometheus-rules.yaml"

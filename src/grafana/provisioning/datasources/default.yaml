@@ -15,3 +15,10 @@ datasources:
         - url: http://jaegerquery:16686/trace/$${__value.raw}
           name: trace_id
           urlDisplayLabel: View in Jaeger UI
+
+  - name: Jaeger
+    uid: otel-traces
+    type: jaeger
+    url: http://jaegerquery:16686
+    editable: true
+    isDefault: false
