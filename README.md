@@ -1,5 +1,33 @@
 # OpenTelemetry For Debug
 
+## How to use
+
+1. Change the value of `CLUSTER_EXTERNAL_IP` in file `.env` to the external IP of the computer where docker will run.
+
+    This is useful if docker running inside WSL and you want to access it from Windows, change the `CLUSTER_EXTERNAL_IP` to the IP of WSL.
+
+2. Change the opentelemetry collector setting in file `src/otelcollector/otelcollector.yaml` to collect application metrics.
+
+    ```diff
+    + - job_name: application-metrics
+    +   scrape_interval: 10s
+    +   static_configs:
+    +     - targets: ["10.196.50.182:5000"]
+    ```
+
+3. Start docker
+
+    ```bash
+    docker compose up -d
+    docker logs -f
+    ```
+
+4. (Optional) Stop docker and cleanup
+
+    ```bash
+    docker compose down
+    ```
+
 ## Exported Ports
 
 | Port | Description | Example |
