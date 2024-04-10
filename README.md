@@ -41,5 +41,6 @@
 
 ## Reference
 
+1. <https://github.com/monitoringartist/opentelemetry-collector-monitoring>
 1. <https://grafana.com/grafana/dashboards/15983-opentelemetry-collector/>
-2. <https://github.com/open-telemetry/opentelemetry-demo>
+1. <https://github.com/open-telemetry/opentelemetry-demo>
