@@ -7,26 +7,58 @@ x-default-logging: &logging
 
 networks:
   default:
-    name: otel4debug
+    name: ${CLUSTER_NAME}
     driver: bridge
 
 services:
+  # https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.12.2
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION}
     restart: on-failure
     ports:
-      - "9200"
-      - "9300"
-    # https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-discovery-settings.html
+      - ${ES_PORT}:9200
     environment:
+      - cluster.name=${CLUSTER_NAME}
+      # https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-discovery-settings.html
       - discovery.type=single-node
+      # https://www.elastic.co/guide/en/elasticsearch/reference/current/security-settings.html
       - xpack.security.enabled=false
+    mem_limit: ${MEM_LIMIT}
+    healthcheck:
+      test: "curl -s http://localhost:9200 | grep -q 'You Know, for Search'"
+      interval: 1s
+      timeout: 1s
+      retries: 120
+      start_period: 10s
+      start_interval: 2s
     logging: *logging
 
-  jaegercollector:
-    image: jaegertracing/jaeger-collector:1.55
+  # https://www.elastic.co/guide/en/kibana/current/docker.html
+  kibana:
+    image: docker.elastic.co/kibana/kibana:${ELASTIC_VERSION}
     restart: on-failure
-    # https://www.jaegertracing.io/docs/1.55/deployment/#collector
+    ports:
+      - ${KIBANA_PORT}:5601
+    environment:
+      - SERVER_NAME=kibana
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    mem_limit: ${MEM_LIMIT}
+    healthcheck:
+      test: "curl -s -I --retry 0 http://localhost:5601 | grep -q 'HTTP/1.1 302 Found'"
+      interval: 1s
+      timeout: 1s
+      retries: 120
+      start_period: 20s
+      start_interval: 2s
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    logging: *logging
+
+  # https://www.jaegertracing.io/docs/1.55/deployment/#collector
+  jaegercollector:
+    image: jaegertracing/jaeger-collector:${JAEGER_VERSION}
+    restart: on-failure
     ports:
       - "4317"
       - "4318"
@@ -36,12 +68,19 @@ services:
       - ES_SERVER_URLS=http://elasticsearch:9200
     command:
       - "--log-level=warn"
+    mem_limit: ${MEM_LIMIT}
+    healthcheck:
+      test: "wget -q -t 1 -O - http://localhost:14269 | grep -q 'Server available'"
+      interval: 1s
+      timeout: 1s
+      retries: 120
     depends_on:
-      - elasticsearch
+      elasticsearch:
+        condition: service_healthy
     logging: *logging
 
   prometheus:
-    image: prom/prometheus:v2.51.0
+    image: prom/prometheus:${PROMETHEUS_VERSION}
     restart: on-failure
     command:
       - "--web.console.templates=/etc/prometheus/consoles"
@@ -57,54 +96,77 @@ services:
     volumes:
       - ./src/prometheus:/etc/prometheus
     ports:
-      - "9090:9090"
+      - ${PROMETHEUS_PORT}:9090
+    mem_limit: ${MEM_LIMIT}
+    healthcheck:
+      test: "wget -q -t 1 -O - http://localhost:9090/-/ready | grep -q 'Prometheus Server is Ready.'"
+      interval: 1s
+      timeout: 1s
+      retries: 120
     logging: *logging
 
   otelcol:
-    image: otel/opentelemetry-collector-contrib:0.96.0
+    image: otel/opentelemetry-collector-contrib:${OTEL_VERSION}
     restart: on-failure
     command:
       - "--config=/etc/otelcollector.yaml"
     volumes:
       - ./src/otelcollector/otelcollector.yaml:/etc/otelcollector.yaml
     ports:
-      - "4317:4317"   # OTLP gRPC receiver
-      - "4318:4318"   # OTLP http receiver
-      - "55679:55679" # zpages (http://localhost:55679/debug/servicez, http://localhost:55679/debug/tracez)
+      - ${OTEL_GRPC_PORT}:4317 # OTLP gRPC receiver
+      - ${OTEL_HTTP_PORT}:4318 # OTLP http receiver
+      - ${OTEL_ZPAGES_PORT}:55679 # zpages (http://localhost:55679/debug/servicez, http://localhost:55679/debug/tracez)
+    mem_limit: ${MEM_LIMIT}
     depends_on:
-      - jaegercollector
-      - prometheus
+      elasticsearch:
+        condition: service_healthy
+      prometheus:
+        condition: service_healthy
     logging: *logging
 
+  # https://www.jaegertracing.io/docs/1.55/deployment/#query-service--ui
   jaegerquery:
-    image: jaegertracing/jaeger-query:1.55
+    image: jaegertracing/jaeger-query:${JAEGER_VERSION}
     restart: on-failure
     command:
       - "--log-level=warn"
       - "--query.ui-config=/etc/jaeger/jaeger-ui.json"
     volumes:
       - ./src/jaegerquery/jaeger-ui.json:/etc/jaeger/jaeger-ui.json
-    # https://www.jaegertracing.io/docs/1.55/deployment/#query-service--ui
     ports:
-      - "16686:16686"
+      - ${JAEGERQUERY_PORT}:16686
     # https://www.jaegertracing.io/docs/1.55/cli/
     environment:
       - SPAN_STORAGE_TYPE=elasticsearch
       - ES_SERVER_URLS=http://elasticsearch:9200
+    mem_limit: ${MEM_LIMIT}
+    healthcheck:
+      test: "wget -q -t 1 -O - http://localhost:16687 | grep -q 'Server available'"
+      interval: 1s
+      timeout: 1s
+      retries: 120
     depends_on:
-      - otelcol
+      elasticsearch:
+        condition: service_healthy
     logging: *logging
 
   grafana:
-    image: grafana/grafana:10.3.4
+    image: grafana/grafana:${GRAFANA_VERSION}
     restart: on-failure
     volumes:
       - ./src/grafana/grafana.ini:/etc/grafana/grafana.ini
       - ./src/grafana/provisioning/:/etc/grafana/provisioning/
     ports:
-      - "3000:3000"
+      - ${GRAFANA_PORT}:3000
     environment:
-      - GF_SERVER_ROOT_URL=http://${CLUSTER_EXTERNAL_IP}:3000
+      - GF_SERVER_ROOT_URL=http://${CLUSTER_IP}:${GRAFANA_PORT}
+    mem_limit: ${MEM_LIMIT}
+    healthcheck:
+      test: 'curl -s --retry 0 http://localhost:3000/api/health | grep -q ''"database": "ok"'''
+      interval: 1s
+      timeout: 1s
+      retries: 120
     depends_on:
-      - otelcol
+      prometheus:
+        condition: service_healthy
     logging: *logging

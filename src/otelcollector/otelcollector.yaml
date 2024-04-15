@@ -1,11 +1,22 @@
 # https://github.com/open-telemetry/opentelemetry-demo/blob/main/src/otelcollector/otelcol-config.yml
 # https://opentelemetry.io/docs/collector/configuration/
 
-# https://grafana.com/grafana/dashboards/15983-opentelemetry-collector/
 # https://github.com/monitoringartist/opentelemetry-collector-monitoring
 
 # https://github.com/open-telemetry/opentelemetry-collector/tree/main/receiver
 receivers:
+
+  # https://github.com/open-telemetry/opentelemetry-collector/tree/main/receiver/otlpreceiver
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+        cors:
+          allowed_origins:
+            - "http://*"
+            - "https://*"
 
   # https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/prometheusreceiver
   prometheus:
@@ -20,18 +31,6 @@ receivers:
         static_configs:
           - targets: ["10.196.50.182:5000"]
 
-  # https://github.com/open-telemetry/opentelemetry-collector/tree/main/receiver/otlpreceiver
-  otlp:
-    protocols:
-      grpc:
-        endpoint: 0.0.0.0:4317
-      http:
-        endpoint: 0.0.0.0:4318
-        cors:
-          allowed_origins:
-            - "http://*"
-            - "https://*"
-
 # https://github.com/open-telemetry/opentelemetry-collector/tree/main/processor
 processors:
 
@@ -39,7 +38,7 @@ processors:
   # should be the first one in the processor
   memory_limiter:
     check_interval: 1s
-    limit_mib: 2000
+    limit_mib: 1000
 
   # https://github.com/open-telemetry/opentelemetry-collector/tree/main/processor/batchprocessor
   batch:
@@ -47,21 +46,22 @@ processors:
 # https://github.com/open-telemetry/opentelemetry-collector/tree/main/exporter
 exporters:
 
-  # https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter/prometheusremotewriteexporter
-  prometheusremotewrite:
-    # prometheus server must have '--enable-feature=remote-write-receiver' or '--web.enable-remote-write-receiver'
-    endpoint: "http://prometheus:9090/api/v1/write"
+  # https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter/elasticsearchexporter
+  elasticsearch:
+    endpoints: ["http://elasticsearch:9200"]
+    traces_index: trace_index
     tls:
       insecure: true
-
+  
   otlp/jaegercollector:
     endpoint: "jaegercollector:4317"
     tls:
       insecure: true
 
-  # https://github.com/open-telemetry/opentelemetry-collector/tree/main/exporter/otlphttpexporter
-  otlphttp/prometheus:
-    endpoint: "http://prometheus:9090/api/v1/otlp"
+  # https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter/prometheusremotewriteexporter
+  prometheusremotewrite:
+    # prometheus server must have '--enable-feature=remote-write-receiver' or '--web.enable-remote-write-receiver'
+    endpoint: "http://prometheus:9090/api/v1/write"
     tls:
       insecure: true
 
@@ -80,7 +80,8 @@ extensions:
 # https://github.com/open-telemetry/opentelemetry-collector/tree/main/service
 service:
 
-  extensions: [zpages]
+  extensions:
+    - zpages
 
   # https://opentelemetry.io/docs/collector/configuration/#telemetry
   telemetry:
