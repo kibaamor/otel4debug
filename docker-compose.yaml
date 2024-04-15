@@ -17,9 +17,9 @@ services:
     command:
       - "--web.console.templates=/etc/prometheus/consoles"
       - "--web.console.libraries=/etc/prometheus/console_libraries"
-      - "--storage.tsdb.retention.time=1h"
-      - "--config.file=/etc/prometheus/prometheus-config.yaml"
+      - "--storage.tsdb.retention.time=1y"
       - "--storage.tsdb.path=/prometheus"
+      - "--config.file=/etc/prometheus/prometheus-config.yaml"
       - "--web.enable-lifecycle"
       - "--web.route-prefix=/"
       - "--enable-feature=exemplar-storage"

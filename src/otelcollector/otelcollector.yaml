@@ -62,6 +62,7 @@ exporters:
   # https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter/elasticsearchexporter
   elasticsearch:
     endpoints: ["http://elasticsearch:9200"]
+    logs_index: logs_index
     tls:
       insecure: true
   
