@@ -12,16 +12,16 @@ datasources:
       timeInterval: 10s
       exemplarTraceIdDestinations:
         - datasourceUid: otel-traces
-          name: traceID
+          name: trace_id
 
-        - url: http://jaegerquery:16686/trace/$${__value.raw}
-          name: traceID
+        - url: http://jaeger:16686/trace/$${__value.raw}
+          name: trace_id
           urlDisplayLabel: View in Jaeger UI
 
   # https://grafana.com/docs/grafana/latest/datasources/jaeger/
   - name: Jaeger
     type: jaeger
     uid: otel-traces
-    url: http://jaegerquery:16686
+    url: http://jaeger:16686
     editable: true
     isDefault: false

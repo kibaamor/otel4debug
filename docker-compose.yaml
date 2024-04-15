@@ -11,6 +11,81 @@ networks:
     driver: bridge
 
 services:
+  prometheus:
+    image: prom/prometheus:${PROMETHEUS_VERSION}
+    restart: on-failure
+    command:
+      - "--web.console.templates=/etc/prometheus/consoles"
+      - "--web.console.libraries=/etc/prometheus/console_libraries"
+      - "--storage.tsdb.retention.time=1h"
+      - "--config.file=/etc/prometheus/prometheus-config.yaml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.enable-lifecycle"
+      - "--web.route-prefix=/"
+      - "--enable-feature=exemplar-storage"
+      - "--enable-feature=otlp-write-receiver"
+      - "--web.enable-remote-write-receiver"
+    volumes:
+      - ./src/prometheus:/etc/prometheus
+    ports:
+      - ${PROMETHEUS_PORT}:9090
+    mem_limit: ${MEM_LIMIT}
+    healthcheck:
+      test: "wget -q -t 1 -O - http://localhost:9090/-/ready | grep -q 'Prometheus Server is Ready.'"
+      interval: 1s
+      timeout: 1s
+      retries: 120
+    logging: *logging
+
+  # https://www.jaegertracing.io/docs/1.56/deployment/
+  jaeger:
+    image: jaegertracing/all-in-one:${JAEGER_VERSION}
+    restart: on-failure
+    ports:
+      - "4317"
+      - "4318"
+      - ${JAEGERQUERY_PORT}:16686
+    # https://www.jaegertracing.io/docs/1.56/cli/#jaeger-all-in-one-prometheus
+    environment:
+      - METRICS_STORAGE_TYPE=prometheus
+      - PROMETHEUS_SERVER_URL=http://prometheus:9090
+      - PROMETHEUS_QUERY_SUPPORT_SPANMETRICS_CONNECTOR=true
+      - PROMETHEUS_QUERY_NORMALIZE_CALLS=true
+      - PROMETHEUS_QUERY_NORMALIZE_DURATION=true
+    command:
+      - "--log-level=warn"
+    mem_limit: ${MEM_LIMIT}
+    healthcheck:
+      test: "wget -q -t 1 -O - http://localhost:14269 | grep -q 'Server available'"
+      interval: 1s
+      timeout: 1s
+      retries: 120
+    depends_on:
+      prometheus:
+        condition: service_healthy
+    logging: *logging
+
+  grafana:
+    image: grafana/grafana:${GRAFANA_VERSION}
+    restart: on-failure
+    volumes:
+      - ./src/grafana/grafana.ini:/etc/grafana/grafana.ini
+      - ./src/grafana/provisioning/:/etc/grafana/provisioning/
+    ports:
+      - ${GRAFANA_PORT}:3000
+    environment:
+      - GF_SERVER_ROOT_URL=http://${CLUSTER_IP}:${GRAFANA_PORT}
+    mem_limit: ${MEM_LIMIT}
+    healthcheck:
+      test: 'curl -s --retry 0 http://localhost:3000/api/health | grep -q ''"database": "ok"'''
+      interval: 1s
+      timeout: 1s
+      retries: 120
+    depends_on:
+      prometheus:
+        condition: service_healthy
+    logging: *logging
+
   # https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION}
@@ -55,56 +130,6 @@ services:
         condition: service_healthy
     logging: *logging
 
-  # https://www.jaegertracing.io/docs/1.55/deployment/#collector
-  jaegercollector:
-    image: jaegertracing/jaeger-collector:${JAEGER_VERSION}
-    restart: on-failure
-    ports:
-      - "4317"
-      - "4318"
-    # https://www.jaegertracing.io/docs/1.55/cli/
-    environment:
-      - SPAN_STORAGE_TYPE=elasticsearch
-      - ES_SERVER_URLS=http://elasticsearch:9200
-    command:
-      - "--log-level=warn"
-    mem_limit: ${MEM_LIMIT}
-    healthcheck:
-      test: "wget -q -t 1 -O - http://localhost:14269 | grep -q 'Server available'"
-      interval: 1s
-      timeout: 1s
-      retries: 120
-    depends_on:
-      elasticsearch:
-        condition: service_healthy
-    logging: *logging
-
-  prometheus:
-    image: prom/prometheus:${PROMETHEUS_VERSION}
-    restart: on-failure
-    command:
-      - "--web.console.templates=/etc/prometheus/consoles"
-      - "--web.console.libraries=/etc/prometheus/console_libraries"
-      - "--storage.tsdb.retention.time=1h"
-      - "--config.file=/etc/prometheus/prometheus-config.yaml"
-      - "--storage.tsdb.path=/prometheus"
-      - "--web.enable-lifecycle"
-      - "--web.route-prefix=/"
-      - "--enable-feature=exemplar-storage"
-      - "--enable-feature=otlp-write-receiver"
-      - "--web.enable-remote-write-receiver"
-    volumes:
-      - ./src/prometheus:/etc/prometheus
-    ports:
-      - ${PROMETHEUS_PORT}:9090
-    mem_limit: ${MEM_LIMIT}
-    healthcheck:
-      test: "wget -q -t 1 -O - http://localhost:9090/-/ready | grep -q 'Prometheus Server is Ready.'"
-      interval: 1s
-      timeout: 1s
-      retries: 120
-    logging: *logging
-
   otelcol:
     image: otel/opentelemetry-collector-contrib:${OTEL_VERSION}
     restart: on-failure
@@ -120,53 +145,6 @@ services:
     depends_on:
       elasticsearch:
         condition: service_healthy
-      prometheus:
-        condition: service_healthy
-    logging: *logging
-
-  # https://www.jaegertracing.io/docs/1.55/deployment/#query-service--ui
-  jaegerquery:
-    image: jaegertracing/jaeger-query:${JAEGER_VERSION}
-    restart: on-failure
-    command:
-      - "--log-level=warn"
-      - "--query.ui-config=/etc/jaeger/jaeger-ui.json"
-    volumes:
-      - ./src/jaegerquery/jaeger-ui.json:/etc/jaeger/jaeger-ui.json
-    ports:
-      - ${JAEGERQUERY_PORT}:16686
-    # https://www.jaegertracing.io/docs/1.55/cli/
-    environment:
-      - SPAN_STORAGE_TYPE=elasticsearch
-      - ES_SERVER_URLS=http://elasticsearch:9200
-    mem_limit: ${MEM_LIMIT}
-    healthcheck:
-      test: "wget -q -t 1 -O - http://localhost:16687 | grep -q 'Server available'"
-      interval: 1s
-      timeout: 1s
-      retries: 120
-    depends_on:
-      elasticsearch:
-        condition: service_healthy
-    logging: *logging
-
-  grafana:
-    image: grafana/grafana:${GRAFANA_VERSION}
-    restart: on-failure
-    volumes:
-      - ./src/grafana/grafana.ini:/etc/grafana/grafana.ini
-      - ./src/grafana/provisioning/:/etc/grafana/provisioning/
-    ports:
-      - ${GRAFANA_PORT}:3000
-    environment:
-      - GF_SERVER_ROOT_URL=http://${CLUSTER_IP}:${GRAFANA_PORT}
-    mem_limit: ${MEM_LIMIT}
-    healthcheck:
-      test: 'curl -s --retry 0 http://localhost:3000/api/health | grep -q ''"database": "ok"'''
-      interval: 1s
-      timeout: 1s
-      retries: 120
-    depends_on:
       prometheus:
         condition: service_healthy
     logging: *logging

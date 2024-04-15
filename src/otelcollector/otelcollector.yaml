@@ -23,11 +23,11 @@ receivers:
     config:
       scrape_configs:
       - job_name: otelcol-metrics
-        scrape_interval: 10s
+        scrape_interval: 15s
         static_configs:
           - targets: ["127.0.0.1:8888"]
       - job_name: application-metrics
-        scrape_interval: 10s
+        scrape_interval: 15s
         static_configs:
           - targets: ["10.196.50.182:5000"]
 
@@ -47,8 +47,8 @@ processors:
 exporters:
 
   # https://github.com/open-telemetry/opentelemetry-collector/tree/main/exporter/otlpexporter
-  otlp/jaegercollector:
-    endpoint: "jaegercollector:4317"
+  otlp:
+    endpoint: "jaeger:4317"
     tls:
       insecure: true
 
@@ -62,8 +62,6 @@ exporters:
   # https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter/elasticsearchexporter
   elasticsearch:
     endpoints: ["http://elasticsearch:9200"]
-    mapping:
-      mode: ecs
     tls:
       insecure: true
   
@@ -71,6 +69,8 @@ exporters:
 connectors:
   # https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector
   spanmetrics:
+    exemplars:
+      enabled: true
 
 # https://github.com/open-telemetry/opentelemetry-collector/tree/main/extension
 extensions:
@@ -95,7 +95,7 @@ service:
     traces:
       receivers: [otlp]
       processors: [memory_limiter, batch]
-      exporters: [otlp/jaegercollector, spanmetrics]
+      exporters: [otlp, spanmetrics]
     metrics:
       receivers: [prometheus, spanmetrics]
       processors: [memory_limiter, batch]

@@ -34,11 +34,11 @@
 
 | Port | Description | Example |
 | :--: | :---------: | :-----: |
-| 9200 | Elasticsearch | <http://localhost:9200> |
-| 5601 | Kibana | <http://localhost:5601> |
 | 9090 | Prometheus UI | <http://localhost:9090> |
 | 16686 | Jaeger Query UI | <http://localhost:16686> |
 | 3000 | Grafana UI | <http://localhost:3000> |
+| 9200 | Elasticsearch | <http://localhost:9200> |
+| 5601 | Kibana | <http://localhost:5601> |
 | 4317 | OTLP gRPC receiver | <http://localhost:4317> |
 | 4318 | OTLP http receiver | <http://localhost:4318> |
 | 55679 | [zpages](https://github.com/open-telemetry/opentelemetry-collector/blob/main/extension/zpagesextension/README.md) for opentelemetry collector | <http://localhost:55679/debug/servicez>, <http://localhost:55679/debug/tracez> |
