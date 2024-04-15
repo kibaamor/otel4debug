@@ -46,13 +46,7 @@ processors:
 # https://github.com/open-telemetry/opentelemetry-collector/tree/main/exporter
 exporters:
 
-  # https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter/elasticsearchexporter
-  elasticsearch:
-    endpoints: ["http://elasticsearch:9200"]
-    traces_index: trace_index
-    tls:
-      insecure: true
-  
+  # https://github.com/open-telemetry/opentelemetry-collector/tree/main/exporter/otlpexporter
   otlp/jaegercollector:
     endpoint: "jaegercollector:4317"
     tls:
@@ -65,6 +59,14 @@ exporters:
     tls:
       insecure: true
 
+  # https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter/elasticsearchexporter
+  elasticsearch:
+    endpoints: ["http://elasticsearch:9200"]
+    mapping:
+      mode: ecs
+    tls:
+      insecure: true
+  
 # https://github.com/open-telemetry/opentelemetry-collector/tree/main/connector
 connectors:
   # https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector
@@ -98,3 +100,7 @@ service:
       receivers: [prometheus, spanmetrics]
       processors: [memory_limiter, batch]
       exporters: [prometheusremotewrite]
+    logs:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [elasticsearch]
