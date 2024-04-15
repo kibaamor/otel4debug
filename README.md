@@ -2,11 +2,11 @@
 
 ## How to use
 
-1. Change the value of `CLUSTER_IP` in file `.env` to the external IP of the computer where docker will run.
+1. Change the value of `CLUSTER_IP` in file [`.env`](./.env) to the external IP of the computer where the docker will run.
 
-    This is useful if docker running inside WSL and you want to access it from Windows, change the `CLUSTER_IP` to the IP of WSL.
+    This is useful if docker is running inside WSL and you want to access it from Windows, change the `CLUSTER_IP` to the IP of WSL.
 
-2. Change the opentelemetry collector setting in file `src/otelcollector/otelcollector.yaml` to collect application metrics.
+2. Change the open telemetry collector setting in file `src/otelcollector/otelcollector.yaml` to collect application metrics.
 
     ```diff
     + - job_name: application-metrics
@@ -30,7 +30,7 @@
 
 ## Exported Ports
 
-> The following ports can be modified in the file `.env`.
+> The following ports can be modified in the file [`.env`](./.env).
 
 | Port | Description | Example |
 | :--: | :---------: | :-----: |
