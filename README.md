@@ -12,7 +12,7 @@
     + - job_name: application-metrics
     +   scrape_interval: 10s
     +   static_configs:
-    +     - targets: ["172.31.203.89:5000"]
+    +     - targets: ["10.196.50.115:5000"]
     ```
 
 3. Start docker

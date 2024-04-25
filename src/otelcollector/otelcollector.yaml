@@ -29,7 +29,7 @@ receivers:
       - job_name: application-metrics
         scrape_interval: 15s
         static_configs:
-          - targets: ["172.31.203.89:5000"]
+          - targets: ["10.196.50.115:5000"]
 
 # https://github.com/open-telemetry/opentelemetry-collector/tree/main/processor
 processors:
