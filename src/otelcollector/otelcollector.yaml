@@ -29,7 +29,7 @@ receivers:
       - job_name: application-metrics
         scrape_interval: 15s
         static_configs:
-          - targets: ["10.196.50.115:5000"]
+          - targets: ${env:PROMETHEUS_SCRAPE_TARGETS}
 
 # https://github.com/open-telemetry/opentelemetry-collector/tree/main/processor
 processors:
@@ -38,7 +38,8 @@ processors:
   # should be the first one in the processor
   memory_limiter:
     check_interval: 1s
-    limit_mib: 1000
+    limit_percentage: 95
+    spike_limit_percentage: 15
 
   # https://github.com/open-telemetry/opentelemetry-collector/tree/main/processor/batchprocessor
   batch:
