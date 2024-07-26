@@ -1,0 +1,7 @@
+services:
+  otelcol:
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+      prometheus:
+        condition: service_healthy

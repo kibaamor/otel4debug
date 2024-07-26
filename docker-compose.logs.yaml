@@ -1,0 +1,63 @@
+x-default-logging: &logging
+  driver: "json-file"
+  options:
+    max-size: "${MAX_LOG_FILE_SIZE}"
+    max-file: "${MAX_LOG_FILE_COUNT}"
+    tag: "{{.Name}}|{{.ImageName}}|{{.ID}}"
+
+services:
+  # https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION}
+    restart: on-failure
+    ports:
+      - ${ES_PORT}:9200
+    environment:
+      - cluster.name=${COMPOSE_PROJECT_NAME}
+      # https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-discovery-settings.html
+      - discovery.type=single-node
+      # https://www.elastic.co/guide/en/elasticsearch/reference/current/security-settings.html
+      - xpack.security.enabled=false
+      # https://www.elastic.co/guide/en/elasticsearch/reference/current/_memory_lock_check.html
+      - bootstrap.memory_lock=true
+      # https://www.elastic.co/guide/en/elasticsearch/reference/8.13/advanced-configuration.html
+      - ES_JAVA_OPTS=$JAVA_OPTS
+    deploy:
+      resources:
+        limits:
+          cpus: ${CPU_LIMIT}
+          memory: ${MEM_LIMIT}
+    healthcheck:
+      test: "curl -s http://localhost:9200 | grep -q 'You Know, for Search'"
+      interval: 1s
+      timeout: 1s
+      retries: 120
+      start_period: 10s
+      start_interval: 2s
+    logging: *logging
+
+  # https://www.elastic.co/guide/en/kibana/current/docker.html
+  kibana:
+    image: docker.elastic.co/kibana/kibana:${ELASTIC_VERSION}
+    restart: on-failure
+    ports:
+      - ${KIBANA_PORT}:5601
+    environment:
+      - SERVER_NAME=kibana
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    deploy:
+      resources:
+        limits:
+          cpus: ${CPU_LIMIT}
+          memory: ${MEM_LIMIT}
+    healthcheck:
+      test: "curl -s -I --retry 0 http://localhost:5601 | grep -q 'HTTP/1.1 302 Found'"
+      interval: 1s
+      timeout: 1s
+      retries: 120
+      start_period: 20s
+      start_interval: 2s
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    logging: *logging
