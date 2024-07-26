@@ -26,9 +26,4 @@ services:
         limits:
           cpus: ${CPU_LIMIT}
           memory: ${MEM_LIMIT}
-    depends_on:
-      elasticsearch:
-        condition: service_healthy
-      prometheus:
-        condition: service_healthy
     logging: *logging
