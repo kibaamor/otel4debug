@@ -26,6 +26,7 @@ services:
       - "--enable-feature=concurrent-rule-eval"
     volumes:
       - ./src/prometheus:/etc/prometheus
+      - prometheus-data:/prometheus
     environment:
       - GOMAXPROCS=${GOMAXPROCS}
       - GOMEMLIMIT=${GOMEMLIMIT}
@@ -83,6 +84,7 @@ services:
     volumes:
       - ./src/grafana/grafana.ini:/etc/grafana/grafana.ini
       - ./src/grafana/provisioning/:/etc/grafana/provisioning/
+      - grafana-data:/var/lib/grafana
     ports:
       - ${GRAFANA_PORT}:3000
     environment:
@@ -103,3 +105,7 @@ services:
       prometheus:
         condition: service_healthy
     logging: *logging
+
+volumes:
+  prometheus-data:
+  grafana-data:

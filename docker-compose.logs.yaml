@@ -22,6 +22,12 @@ services:
       - bootstrap.memory_lock=true
       # https://www.elastic.co/guide/en/elasticsearch/reference/8.13/advanced-configuration.html
       - ES_JAVA_OPTS=$JAVA_OPTS
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
     deploy:
       resources:
         limits:
@@ -45,6 +51,8 @@ services:
     environment:
       - SERVER_NAME=kibana
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    volumes:
+      - kibana-data:/usr/share/kibana/data
     deploy:
       resources:
         limits:
@@ -61,3 +69,7 @@ services:
       elasticsearch:
         condition: service_healthy
     logging: *logging
+
+volumes:
+  elasticsearch-data:
+  kibana-data:
